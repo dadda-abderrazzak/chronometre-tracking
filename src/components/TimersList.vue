@@ -1,7 +1,7 @@
 <template>
     <div class="timers-list">
         <div class="container-filter-bar">
-            <input v-model="filterTag" placeholder="Filtrer par ressource" @input="filterTimers" />
+            <input v-model="filterResource" placeholder="Filtrer par ressource" @input="filterTimers" />
         </div>
         <table class="table-all-timers">
             <thead>
@@ -22,7 +22,7 @@
                     <td>{{ timer.start }}</td>
                     <td>{{ timer.end }}</td>
                     <td>{{ timer.duration }}</td>
-                    <td><input v-model="timer.tag" @input="updateLocalStorage" /></td>
+                    <td>{{ timer.resource }}</td>
                     <td><input v-model="timer.description" @input="updateLocalStorage" /></td>
                 </tr>
             </tbody>
@@ -36,16 +36,16 @@ export default {
     props: ['timers'],
     data() {
         return {
-            filterTag: ''
+            filterResource: ''
         };
     },
     computed: {
         filteredTimers() {
-            if (this.filterTag.trim() === '') {
+            if (this.filterResource.trim() === '') {
                 return this.timers;
             } else {
-                const tag = this.filterTag.trim().toLowerCase();
-                return this.timers.filter(timer => timer.tag.toLowerCase().includes(tag));
+                const resource = this.filterResource.trim().toLowerCase();
+                return this.timers.filter(timer => timer.resource.toLowerCase().includes(resource));
             }
         }
     },

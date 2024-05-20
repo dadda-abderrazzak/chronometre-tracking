@@ -1,12 +1,13 @@
 <template>
-  <Timer :hours="hours" :minutes="minutes" :seconds="seconds" :isRunning="isRunning" @toggle="toggleTimer"
-    @clear="clearTimer" />
+  <Timer :hours="hours" :minutes="minutes" :seconds="seconds" :isRunning="isRunning" :isPaused="isPaused" :resources="resources"
+    @start="startTimer" @pause="pauseTimer" @stop="stopTimer" @clear="clearTimer" />
   <TimersList :timers="filteredTimers" @remove="removeTimer" @filter="filterTimers" />
 </template>
 
 <script>
 import Timer from './components/Timer.vue';
 import TimersList from './components/TimersList.vue';
+import Papa from 'papaparse';
 
 export default {
   data() {
@@ -19,23 +20,29 @@ export default {
       elapsedTime: 0,
       timers: JSON.parse(localStorage.getItem('timers')) || [],
       isRunning: false,
-      filterTag: '',
-      filteredTimers: []
+      isPaused: false,
+      filterResource: '',
+      filteredTimers: [],
+      resources: []
     };
   },
   mounted() {
+    this.loadResources();
     this.filterTimers();
   },
   methods: {
-    toggleTimer() {
-      if (this.isRunning) {
-        this.stopTimer();
-      } else {
-        this.startTimer();
-      }
+    loadResources() {
+      Papa.parse('./resources.csv', {
+        download: true,
+        header: true,
+        complete: (results) => {
+          this.resources = results.data.map(row => row.resource);
+        }
+      });
     },
     startTimer() {
       this.isRunning = true;
+      this.isPaused = false;
       this.startTime = new Date() - this.elapsedTime;
       this.interval = setInterval(() => {
         const now = new Date();
@@ -45,8 +52,18 @@ export default {
         this.hours = String(Math.floor(this.elapsedTime / 3600000)).padStart(2, '0');
       }, 1000);
     },
-    stopTimer() {
+    pauseTimer() {
       this.isRunning = false;
+      this.isPaused = true;
+      clearInterval(this.interval);
+    },
+    stopTimer(resource) {
+      if (!resource) {
+        alert('Sélectionnez une ressource pour arrêter le timer.');
+        return;
+      }
+      this.isRunning = false;
+      this.isPaused = false;
       clearInterval(this.interval);
       const endTime = new Date();
       const duration = this.elapsedTime;
@@ -56,11 +73,14 @@ export default {
         end: endTime.toLocaleTimeString(),
         duration: formattedDuration,
         description: '',
-        tag: ''
+        resource: resource,
       });
       this.updateLocalStorage();
       this.filterTimers();
       this.elapsedTime = 0;
+      this.hours = '00';
+      this.minutes = '00';
+      this.seconds = '00';
     },
     clearTimer() {
       if (this.interval) {
@@ -68,6 +88,7 @@ export default {
         this.interval = null;
       }
       this.isRunning = false;
+      this.isPaused = false;
       this.hours = '00';
       this.minutes = '00';
       this.seconds = '00';
@@ -82,11 +103,11 @@ export default {
       this.filterTimers();
     },
     filterTimers() {
-      if (this.filterTag.trim() === '') {
+      if (this.filterResource.trim() === '') {
         this.filteredTimers = this.timers;
       } else {
-        const tag = this.filterTag.trim().toLowerCase();
-        this.filteredTimers = this.timers.filter(timer => timer.tag.toLowerCase().includes(tag));
+        const resource = this.filterResource.trim().toLowerCase();
+        this.filteredTimers = this.timers.filter(timer => timer.resource.toLowerCase().includes(resource));
       }
     }
   },
