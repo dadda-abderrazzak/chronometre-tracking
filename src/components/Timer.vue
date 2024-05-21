@@ -1,5 +1,12 @@
 <template>
-    <div class="timer-container">
+    <div v-if="!selectedResource" class="ressource-container">
+        <select v-model="selectedResource">
+            <option value="" disabled>Sélectionner une ressource</option>
+            <option v-for="resource in resources" :key="resource" :value="resource">{{ resource }}</option>
+        </select>
+    </div>
+    <div v-else class="timer-container">
+        <button class="reset" @click="choseResource()"><i class="fa fa-arrow-left"></i> Retour</button>
         <div class="timer">{{ hours }}:{{ minutes }}:{{ seconds }}</div>
         <div class="controls">
             <button class="start" v-if="!isRunning" @click="$emit('start')">{{
@@ -7,12 +14,6 @@
             <button v-if="isRunning" @click="$emit('pause')">Pause</button>
             <button class="stop" @click="validateStop()">Stop</button>
             <button class="clear" @click="$emit('clear')">Clear</button>
-        </div>
-        <div class="ressource-container">
-            <select v-model="selectedResource">
-                <option value="" disabled>Sélectionner une ressource</option>
-                <option v-for="resource in resources" :key="resource" :value="resource">{{ resource }}</option>
-            </select>
         </div>
     </div>
 
@@ -34,6 +35,10 @@ export default {
                 this.$emit('stop', this.selectedResource);
                 this.selectedResource = '';
             }
+        },
+        choseResource() {
+            this.$emit('clear');
+            this.selectedResource = '';
         }
     }
 };
@@ -47,6 +52,7 @@ export default {
     background-color: #333;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     margin: 3rem 0;
+    position: relative;
 }
 
 .timer-container .timer {
@@ -77,11 +83,23 @@ export default {
     color: #000000;
 }
 
+.timer-container .reset {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #ECDBBA;
+    color: #000000;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
 .ressource-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 1rem;
+    margin: 2rem 0;
 }
 .ressource-container select {
     padding: 10px;
