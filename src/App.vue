@@ -7,7 +7,6 @@
 <script>
 import Timer from './components/Timer.vue';
 import TimersList from './components/TimersList.vue';
-import Papa from 'papaparse';
 
 export default {
   data() {
