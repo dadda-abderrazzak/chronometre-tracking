@@ -32,13 +32,8 @@ export default {
   },
   methods: {
     loadResources() {
-      Papa.parse('./resources.csv', {
-        download: true,
-        header: true,
-        complete: (results) => {
-          this.resources = results.data.map(row => row.resource);
-        }
-      });
+      const envResources = import.meta.env.VITE_LIST_RESOURCES;
+      this.resources = envResources.split(',').map(resource => resource.trim()).filter(resource => resource);
     },
     startTimer() {
       this.isRunning = true;
