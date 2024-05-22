@@ -7,12 +7,13 @@
     </div>
     <div v-else class="timer-container">
         <button class="reset" @click="choseResource()"><i class="fa fa-arrow-left"></i> Retour</button>
-        <div class="timer">{{ hours }}:{{ minutes }}:{{ seconds }}</div>
+        <span class="current-resource">{{ selectedResource }}</span>
+        <div class="timer">{{ hours }}:{{ minutes }}:{{ seconds }}:{{ milliseconds }}</div>
         <div class="controls">
             <button class="start" v-if="!isRunning" @click="$emit('start')">{{
                 isPaused ? 'Continue' : 'Start' }}</button>
-            <button v-if="isRunning" @click="$emit('pause')">Pause</button>
-            <button class="stop" @click="validateStop()">Stop</button>
+            <button v-if="isRunning" class="pause" @click="$emit('pause')">Pause</button>
+            <button class="stop" v-if="isRunning || isPaused" @click="validateStop()">Stop</button>
             <button class="clear" @click="$emit('clear')">Clear</button>
         </div>
     </div>
@@ -21,7 +22,7 @@
 
 <script>
 export default {
-    props: ['hours', 'minutes', 'seconds', 'isRunning', 'isPaused', 'resources'],
+    props: ['hours', 'minutes', 'seconds', 'milliseconds', 'isRunning', 'isPaused', 'resources'],
     data() {
         return {
             selectedResource: ''
@@ -83,6 +84,10 @@ export default {
     color: #000000;
 }
 
+.timer-container .controls button.pause {
+    background-color: #6b6b6b;
+}
+
 .timer-container .reset {
     position: absolute;
     top: 10px;
@@ -93,6 +98,14 @@ export default {
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.timer-container .current-resource {
+    font-size: 1.5rem;
+    color: #ECDBBA;
+    position: absolute;
+    top: 10px;
+    right: 10px;
 }
 
 .ressource-container {

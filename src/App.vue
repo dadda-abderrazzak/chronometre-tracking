@@ -1,5 +1,5 @@
 <template>
-  <Timer :hours="hours" :minutes="minutes" :seconds="seconds" :isRunning="isRunning" :isPaused="isPaused" :resources="resources"
+  <Timer :hours="hours" :minutes="minutes" :seconds="seconds" :milliseconds="milliseconds" :isRunning="isRunning" :isPaused="isPaused" :resources="resources"
     @start="startTimer" @pause="pauseTimer" @stop="stopTimer" @clear="clearTimer" />
   <TimersList :timers="filteredTimers" @remove="removeTimer" @filter="filterTimers" />
 </template>
@@ -14,6 +14,7 @@ export default {
       hours: '00',
       minutes: '00',
       seconds: '00',
+      milliseconds: '000',
       interval: null,
       startTime: null,
       elapsedTime: 0,
@@ -41,10 +42,11 @@ export default {
       this.interval = setInterval(() => {
         const now = new Date();
         this.elapsedTime = now - this.startTime;
+        this.milliseconds = String(this.elapsedTime % 1000).padStart(3, '0');
         this.seconds = String(Math.floor((this.elapsedTime / 1000) % 60)).padStart(2, '0');
         this.minutes = String(Math.floor((this.elapsedTime / 60000) % 60)).padStart(2, '0');
         this.hours = String(Math.floor(this.elapsedTime / 3600000)).padStart(2, '0');
-      }, 1000);
+      }, 100);
     },
     pauseTimer() {
       this.isRunning = false;
@@ -75,6 +77,7 @@ export default {
       this.hours = '00';
       this.minutes = '00';
       this.seconds = '00';
+      this.milliseconds = '000';
     },
     clearTimer() {
       if (this.interval) {
@@ -86,6 +89,7 @@ export default {
       this.hours = '00';
       this.minutes = '00';
       this.seconds = '00';
+      this.milliseconds = '000';
       this.elapsedTime = 0;
     },
     updateLocalStorage() {
